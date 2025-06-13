@@ -107,6 +107,22 @@ def logout_user(request):
     return Response({'success': 'User successfully logged out'}, status=200)
 
 
+@api_view(['GET'])
+def get_user(request, id):
+    """
+    Returns information about the current logged in user.
+    
+    #### response:
+    - user: user data
+    """
+    try:
+        user = User.objects.get(id=id)
+    except User.DoesNotExist:
+        return Response({'error': f'User with id {id} does not exist.'}, status=400)
+    serializer = UserSerializer(user)
+    return Response({'user': serializer.data}, status=200)
+
+
 @login_required
 @api_view(['PATCH'])
 def edit_user(request):
@@ -159,15 +175,3 @@ def delete_user(request, id):
     
     return Response({'success': 'User Successfully deleted'}, status=200)
 
-
-@api_view(['GET'])
-def user_profile(request):
-    """
-    Returns information about the current logged in user.
-    
-    #### response:
-    - user: user data
-    """
-    user = request.user
-    serializer = UserSerializer(user)
-    return Response({'user': serializer.data}, status=200)
